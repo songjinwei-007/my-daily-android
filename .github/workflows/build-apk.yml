@@ -10,7 +10,7 @@ on:
       - ".github/workflows/build-apk.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -43,10 +43,20 @@ jobs:
         working-directory: MyDailyAndroid
         run: gradle --no-daemon :app:assembleDebug
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: MyDaily-debug-apk
           path: MyDailyAndroid/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish direct APK download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="v2.2.${{ github.run_number }}"
+          gh release create "$VERSION" \
+            MyDailyAndroid/app/build/outputs/apk/debug/app-debug.apk \
+            --title "My Daily $VERSION" \
+            --notes "Direct APK build from commit ${{ github.sha }}"

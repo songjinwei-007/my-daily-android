@@ -11,6 +11,9 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.view.View
+import android.view.WindowInsets
+import android.os.Build
+import android.widget.FrameLayout
 import android.widget.Toast
 
 class MainActivity : Activity() {
@@ -51,10 +54,19 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.statusBarColor = android.graphics.Color.rgb(243, 245, 251)
-        window.navigationBarColor = android.graphics.Color.rgb(243, 245, 251)
+        val systemBackground = android.graphics.Color.rgb(243, 245, 251)
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
         window.decorView.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+            View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+        val root = FrameLayout(this).apply {
+            setBackgroundColor(systemBackground)
+        }
 
         webView = WebView(this)
         webView.setBackgroundColor(android.graphics.Color.rgb(243, 245, 251))
@@ -93,7 +105,41 @@ class MainActivity : Activity() {
         webView.settings.cacheMode = WebSettings.LOAD_DEFAULT
         webView.addJavascriptInterface(AndroidBridge(), "AndroidBridge")
 
-        setContentView(webView)
+        root.addView(
+            webView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        )
+
+        // Keep the WebView viewport between system bars so fixed CSS headers start below the status bar.
+        root.setOnApplyWindowInsetsListener { _, insets ->
+            val topInset: Int
+            val bottomInset: Int
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val bars = insets.getInsets(
+                    WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
+                )
+                topInset = bars.top
+                bottomInset = bars.bottom
+            } else {
+                @Suppress("DEPRECATION")
+                topInset = insets.systemWindowInsetTop
+                @Suppress("DEPRECATION")
+                bottomInset = insets.systemWindowInsetBottom
+            }
+            val params = webView.layoutParams as FrameLayout.LayoutParams
+            if (params.topMargin != topInset || params.bottomMargin != bottomInset) {
+                params.topMargin = topInset
+                params.bottomMargin = bottomInset
+                webView.layoutParams = params
+            }
+            insets
+        }
+
+        setContentView(root)
+        root.requestApplyInsets()
         webView.loadUrl("file:///android_asset/index.html")
     }
 

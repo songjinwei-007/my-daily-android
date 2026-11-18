@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Build
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -55,6 +56,9 @@ class MainActivity : Activity() {
         // Do not draw the WebView underneath Android system bars.
         // The OS reserves the status/navigation-bar areas, so the app header
         // starts cleanly below the notification/status bar on different phones.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(true)
+        }
         val systemBackground = android.graphics.Color.rgb(243, 245, 251)
         window.statusBarColor = systemBackground
         window.navigationBarColor = systemBackground

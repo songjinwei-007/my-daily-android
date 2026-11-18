@@ -48,7 +48,7 @@ jobs:
           scripts = re.findall(r"<script>([\s\S]*?)</script>", html, re.I)
           if not scripts:
               raise SystemExit("No embedded application script found")
-          Path("/tmp/mydaily-app.js").write_text("\\n".join(scripts), encoding="utf-8")
+          Path("/tmp/mydaily-app.js").write_text("\n".join(scripts), encoding="utf-8")
           PY
           node --check /tmp/mydaily-app.js
 

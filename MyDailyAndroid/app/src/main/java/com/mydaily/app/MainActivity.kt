@@ -12,6 +12,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.view.View
+import android.view.WindowInsets
 import android.widget.FrameLayout
 import android.widget.Toast
 
@@ -57,7 +58,10 @@ class MainActivity : Activity() {
         // The OS reserves the status/navigation-bar areas, so the app header
         // starts cleanly below the notification/status bar on different phones.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(true)
+            // Draw edge-to-edge, then apply the real system-bar insets to the
+            // content root. This prevents the fixed HTML header from sitting
+            // underneath the Android status bar on devices that enforce it.
+            window.setDecorFitsSystemWindows(false)
         }
         val systemBackground = android.graphics.Color.rgb(243, 245, 251)
         window.statusBarColor = systemBackground
@@ -68,6 +72,26 @@ class MainActivity : Activity() {
 
         val root = FrameLayout(this).apply {
             setBackgroundColor(systemBackground)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                setOnApplyWindowInsetsListener { view, insets ->
+                    val bars = insets.getInsets(
+                        WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
+                    )
+                    view.setPadding(0, bars.top, 0, bars.bottom)
+                    insets
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                setOnApplyWindowInsetsListener { view, insets ->
+                    view.setPadding(
+                        0,
+                        insets.systemWindowInsetTop,
+                        0,
+                        insets.systemWindowInsetBottom
+                    )
+                    insets
+                }
+            }
         }
 
         webView = WebView(this)
@@ -115,7 +139,7 @@ class MainActivity : Activity() {
             )
         )
 
-        // The root view already fits the system windows; no manual inset margins.
+        // Apply status/navigation bar insets before the WebView is displayed.
         setContentView(root)
         root.requestApplyInsets()
         webView.loadUrl("file:///android_asset/index.html")

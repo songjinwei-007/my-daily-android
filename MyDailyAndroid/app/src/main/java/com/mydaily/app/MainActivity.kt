@@ -11,8 +11,6 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.view.View
-import android.view.WindowInsets
-import android.os.Build
 import android.widget.FrameLayout
 import android.widget.Toast
 
@@ -54,13 +52,13 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Do not draw the WebView underneath Android system bars.
+        // The OS reserves the status/navigation-bar areas, so the app header
+        // starts cleanly below the notification/status bar on different phones.
         val systemBackground = android.graphics.Color.rgb(243, 245, 251)
-        window.statusBarColor = android.graphics.Color.TRANSPARENT
-        window.navigationBarColor = android.graphics.Color.TRANSPARENT
+        window.statusBarColor = systemBackground
+        window.navigationBarColor = systemBackground
         window.decorView.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
             View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
             View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
@@ -113,31 +111,7 @@ class MainActivity : Activity() {
             )
         )
 
-        // Keep the WebView viewport between system bars so fixed CSS headers start below the status bar.
-        root.setOnApplyWindowInsetsListener { _, insets ->
-            val topInset: Int
-            val bottomInset: Int
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val bars = insets.getInsets(
-                    WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
-                )
-                topInset = bars.top
-                bottomInset = bars.bottom
-            } else {
-                @Suppress("DEPRECATION")
-                topInset = insets.systemWindowInsetTop
-                @Suppress("DEPRECATION")
-                bottomInset = insets.systemWindowInsetBottom
-            }
-            val params = webView.layoutParams as FrameLayout.LayoutParams
-            if (params.topMargin != topInset || params.bottomMargin != bottomInset) {
-                params.topMargin = topInset
-                params.bottomMargin = bottomInset
-                webView.layoutParams = params
-            }
-            insets
-        }
-
+        // The root view already fits the system windows; no manual inset margins.
         setContentView(root)
         root.requestApplyInsets()
         webView.loadUrl("file:///android_asset/index.html")

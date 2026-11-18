@@ -45,7 +45,7 @@ jobs:
           from pathlib import Path
           import re
           html = Path("MyDailyAndroid/app/src/main/assets/index.html").read_text(encoding="utf-8")
-          scripts = re.findall(r"<script>([\\s\\S]*?)</script>", html, re.I)
+          scripts = re.findall(r"<script>([\s\S]*?)</script>", html, re.I)
           if not scripts:
               raise SystemExit("No embedded application script found")
           Path("/tmp/mydaily-app.js").write_text("\\n".join(scripts), encoding="utf-8")

@@ -4,12 +4,12 @@
 :root{--bg:#f3f5fb;--panel:#ffffff;--soft:#f5f7fc;--fg:#303442;--muted:#858b9b;--line:#e5e9f2;--accent:#536ff2;--accentSoft:#edf1ff;--green:#27ad83;--purple:#8b75df}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px system-ui,-apple-system,sans-serif}
 .wrap{max-width:760px;margin:auto;padding:0 14px calc(92px + env(safe-area-inset-bottom))}
-header{position:fixed;z-index:30;top:10px;left:50%;transform:translateX(-50%);width:100%;max-width:760px;min-height:62px;padding:10px 14px;background:var(--bg);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);box-shadow:0 3px 14px #30344208}
+header{position:fixed;z-index:30;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:760px;min-height:62px;padding:10px 14px;background:var(--bg);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);box-shadow:0 3px 14px #30344208}
 h1{font-size:23px;margin:0}h2{font-size:18px;margin:0 0 12px}.muted{color:var(--muted);font-size:12px}
 button{border:0;font:inherit;cursor:pointer}.soft,.month button{background:var(--soft);color:var(--fg);padding:8px 12px;border-radius:10px}
 .primary{background:var(--accent);color:white;border-radius:11px;padding:9px 13px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:14px}
-.pagebody{padding-top:82px}.view{display:none}.view.show{display:block}
+.pagebody{padding-top:72px}.view{display:none}.view.show{display:block}
 .month{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .cal span{text-align:center;color:var(--muted);font-size:11px;padding:7px 0}.day{background:#f7f8fd;color:var(--fg);border-radius:12px;min-height:56px;padding:7px 0;font-weight:600}.day.sel{background:var(--accentSoft);outline:2px solid var(--accent);color:var(--accent)}.day small{display:block;color:var(--accent);font-size:10px;height:11px}
 .headrow{display:flex;justify-content:space-between;align-items:center;margin:10px 0}.task{display:flex;gap:9px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
